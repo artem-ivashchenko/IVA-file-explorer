@@ -6,7 +6,6 @@ import {
   Image,
   Th,
   Tr,
-  useToast,
 } from "@chakra-ui/react";
 
 import Overlay from "./Overlay";
@@ -21,25 +20,16 @@ import { setPending, setUpload } from "../store/slice/itemSlice";
 import fetchLink from "../store/thunk/fetchLink";
 import fetchContent from "../store/thunk/fetchContent";
 import deleteItem from "../store/thunk/deleteItem";
+import useToastUtil from "../utils/showToast";
 
 const TableRow = ({ item }) => {
   const { pendingID, thumbs } = useSelector((state) => state.items);
   const { preview } = useSelector((state) => state.filters);
-  const dispatch = useDispatch();
-  const toast = useToast();
-  const thumbnailObj = thumbs.find((element) => element.id === item.id);
 
-  const showToast = (response) => {
-    if (response.error) {
-      toast({
-        title: "Error has occured",
-        description: response.payload,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
+  const dispatch = useDispatch();
+  const { showToastErrorPromise, showToast } = useToastUtil();
+
+  const thumbnailObj = thumbs.find((element) => element.id === item.id);
 
   const handleRedirect = () => {
     if (item[".tag"] === "folder") {
@@ -47,7 +37,7 @@ const TableRow = ({ item }) => {
     } else {
       dispatch(setPending(item.id));
       dispatch(fetchLink({ path: item["path_lower"] }))
-        .then(showToast)
+        .then(showToastErrorPromise)
         .finally(() => dispatch(setPending("")));
     }
   };
@@ -61,7 +51,7 @@ const TableRow = ({ item }) => {
         type: item[".tag"],
       })
       )
-      .then(showToast)
+      .then(showToastErrorPromise)
       .finally(() => dispatch(setPending("")));
     };
     
@@ -72,15 +62,7 @@ const TableRow = ({ item }) => {
     dispatch(deleteItem({
       path: item["path_lower"],
     }))
-    .then((response) => {
-      toast({
-        title: response.error ? "Error has occured" : "Success",
-        description: response.payload,
-        status: response.error ? "error" : "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    })
+    .then(showToast)
     .finally(() => {
       dispatch(setPending(""))
       dispatch(setUpload())
@@ -95,7 +77,7 @@ const TableRow = ({ item }) => {
       }}
       transition="all 0.3s linear"
       position="relative"
-      onClick={() => handleRedirect()}
+      onClick={handleRedirect}
     >
       <Th>
         {preview === "thumbs" && thumbnailObj && (

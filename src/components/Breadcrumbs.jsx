@@ -17,6 +17,7 @@ const Breadcrumbs = () => {
     }
 
     const redirectTo = '/' + [...pathItems].slice(0, index + 1).join('/');
+
     dispatch(setPath(redirectTo));
   }
 

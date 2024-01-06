@@ -1,21 +1,9 @@
 import { Icon, Text, VStack } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPending } from "../store/slice/itemSlice";
+import { useSelector } from "react-redux";
 import Overlay from "./Overlay";
 
 const MainButton = ({ icon, text, handleClick = () => {} }) => {
   const pendingID = useSelector((state) => state.items.pendingID);
-  const dispatch = useDispatch();
-
-  const handleDelay = () => {
-    if (text === "Download folder") {
-      dispatch(setPending(text));
-      handleClick().finally(() => dispatch(setPending("")));
-      return;
-    }
-
-    handleClick();
-  };
 
   return (
     <VStack
@@ -32,7 +20,7 @@ const MainButton = ({ icon, text, handleClick = () => {} }) => {
         cursor: "pointer",
       }}
       textAlign="center"
-      onClick={() => handleDelay()}
+      onClick={handleClick}
     >
       <Icon as={icon} boxSize={14} />
       <Text as="b">{text}</Text>

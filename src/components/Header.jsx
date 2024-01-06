@@ -26,10 +26,11 @@ import { setQuery } from "../store/slice/filterSlice";
 import { clearFilteredItems, setLoading } from "../store/slice/itemSlice";
 
 const Header = () => {
+  const [rawQuery, setRawQuery] = useState("");
   const query = useSelector((state) => state.filters.query);
+  
   const dispatch = useDispatch();
   const toast = useToast();
-  const [rawQuery, setRawQuery] = useState("");
 
   const applyQuery = useCallback(
     debounce((value) => {
@@ -56,8 +57,8 @@ const Header = () => {
 
   useEffect(() => {
     if (!query) {
-      dispatch(setLoading(false));
       dispatch(clearFilteredItems());
+      dispatch(setLoading(false));
       return;
     }
 
@@ -67,11 +68,16 @@ const Header = () => {
   return (
     <Box boxShadow="xl">
       <Container>
-        <HStack py={3} justify="space-between" spacing={{base: 3, sm: 6}}>
+        <HStack 
+          justify="space-between" 
+          py={3} 
+          spacing={{base: 3, sm: 6}}
+        >
           <HStack spacing={2}>
             <Icon as={CloudDoneIcon} boxSize={{ base: 8, md: 10}} />
             <Heading fontSize={{base: 18, sm: 26}}>IVA</Heading>
           </HStack>
+
           <InputGroup>
             <Input
               variant='filled'
@@ -95,9 +101,18 @@ const Header = () => {
               </InputRightElement>
             )}
           </InputGroup>
+
           <HStack>
-            <IconButton variant="outline" icon={<NotificationsActiveIcon />} onClick={handleNotImplemented}/>
-            <IconButton variant="outline" icon={<AccountCircleIcon />} onClick={handleNotImplemented}/>
+            <IconButton 
+              variant="outline" 
+              icon={<NotificationsActiveIcon />} 
+              onClick={handleNotImplemented}
+            />
+            <IconButton 
+              variant="outline" 
+              icon={<AccountCircleIcon />} 
+              onClick={handleNotImplemented}
+            />
           </HStack>
         </HStack>
       </Container>

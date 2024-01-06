@@ -18,7 +18,6 @@ import {
   Th,
   Thead,
   Tr,
-  useToast,
 } from "@chakra-ui/react";
 
 import FolderCopyIcon from "@mui/icons-material/FolderCopy";
@@ -37,6 +36,7 @@ import { clearFilteredItems } from "../store/slice/itemSlice";
 import fetchThumbs from "../store/thunk/fetchThumbs";
 import fetchItems from "../store/thunk/fetchItems";
 import getVisibleItems from "../utils/getVisibleItems";
+import useToastUtil from "../utils/showToast";
 
 const TableItems = () => {
   const { items, filteredItems, loading, errorAlert, upload } = useSelector(
@@ -48,21 +48,20 @@ const TableItems = () => {
   const path = useSelector((state) => state.path);
 
   const dispatch = useDispatch();
-  const toast = useToast();
+  const { showToastErrorPromise } = useToastUtil();
 
   const chosenItems = query ? filteredItems : items;
   const visibleItems = getVisibleItems(chosenItems, type, sortField);
 
   useEffect(() => {
-    dispatch(clearFilteredItems());
+    // dispatch(clearFilteredItems());
     dispatch(setQuery(""));
 
-    dispatch(fetchItems(path))
-      .then((response) => {
-        if (preview === "thumbs") {
-          handleFetchThumbs(response.payload);
-        }
-      })
+    dispatch(fetchItems(path)).then((response) => {
+      if (preview === "thumbs" && !response.error) {
+        handleFetchThumbs(response.payload);
+      }
+    });
   }, [path, upload]);
 
   const handleTypeChange = (e) => {
@@ -82,17 +81,8 @@ const TableItems = () => {
   };
 
   const handleFetchThumbs = (payload) => {
-    dispatch(fetchThumbs({ items: payload || items })).then((response) => {
-      if (response.error) {
-        toast({
-          title: "Error has occured",
-          description: response.payload,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    });
+    dispatch(fetchThumbs({ items: payload || items }))
+    .then(showToastErrorPromise);
   };
 
   const handlePreviewChange = (e) => {
@@ -102,6 +92,12 @@ const TableItems = () => {
       handleFetchThumbs();
     }
   };
+
+  const handleSortField = (e, name) => {
+    dispatch(
+      setSortField({ name, value: e.target.value })
+    )
+  }
 
   const handleMoveUp = () => {
     const pathSlice = path.split("/");
@@ -120,12 +116,13 @@ const TableItems = () => {
 
   return (
     <Box>
-      <HStack display={{base:'flex',md: 'none'}}>
-        <Heading fontSize={20}>Sorry, viewing table is only possible on desktop</Heading>
+      <HStack display={{ base: "flex", md: "none" }}>
+        <Heading fontSize={20}>
+          Sorry, viewing table is only possible on desktop
+        </Heading>
       </HStack>
 
-
-      <Table variant="simple" display={{base:'none',md: 'table'}}>
+      <Table variant="simple" display={{ base: "none", md: "table" }}>
         <Thead>
           <Tr>
             <Th>
@@ -144,11 +141,7 @@ const TableItems = () => {
                 variant="unstyled"
                 placeholder="Name"
                 value="Name"
-                onChange={(e) =>
-                  dispatch(
-                    setSortField({ name: "name", value: e.target.value })
-                  )
-                }
+                onChange={(e) => handleSortField(e, 'name')}
               >
                 <option value="asc">From A to Z</option>
                 <option value="desc">From Z to A</option>
@@ -172,11 +165,7 @@ const TableItems = () => {
                 variant="unstyled"
                 placeholder="Size"
                 value="Size"
-                onChange={(e) =>
-                  dispatch(
-                    setSortField({ name: "size", value: e.target.value })
-                  )
-                }
+                onChange={(e) => handleSortField(e, 'size')}
               >
                 <option value="asc">Small first</option>
                 <option value="desc">Large first</option>
@@ -215,23 +204,12 @@ const TableItems = () => {
         </Tbody>
       </Table>
 
-      {!chosenItems.length && !errorAlert && !query && (
+      {!chosenItems.length && !errorAlert && (
         <Flex w="100%" mt={3}>
-          <Alert status="info" justifyContent="center">
+          <Alert status={query ? "warning": "info"} justifyContent="center">
             <AlertIcon />
             <AlertDescription>
-              Seems like your folder is empty....
-            </AlertDescription>
-          </Alert>
-        </Flex>
-      )}
-
-      {!chosenItems.length && !errorAlert && query && (
-        <Flex w="100%" mt={3}>
-          <Alert status="warning" justifyContent="center">
-            <AlertIcon />
-            <AlertDescription>
-              There is no right match for the query...
+              {query ? 'There is no right match for the query...' : 'Seems like your folder is empty....'}
             </AlertDescription>
           </Alert>
         </Flex>

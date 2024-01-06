@@ -1,16 +1,9 @@
-const crypto = require('crypto-browserify');
-const util = require('util');
+const { override, addWebpackAlias } = require('customize-cra');
 
-const isEnvProduction = process.env.NODE_ENV === 'production';
-
-module.exports = function override(config, env) {
-  if (isEnvProduction) {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      crypto: false,
-      util: false,
-    };
-  }
-
-  return config;
-};
+module.exports = override(
+  addWebpackAlias({
+    crypto: require.resolve('crypto-browserify'),
+    stream: require.resolve('stream-browserify'),
+    buffer: require.resolve('buffer'),
+  })
+);
