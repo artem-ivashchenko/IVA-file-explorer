@@ -16,6 +16,7 @@
     "dropbox": "^10.34.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^10.16.16",
+    "gh-pages": "^6.1.1",
     "lodash.debounce": "^4.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -23,7 +24,10 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "homepage": "https://artem-ivashchenko.github.io/IVA-file-explorer",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build --branch=gh-pages",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
