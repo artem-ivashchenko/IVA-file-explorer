@@ -15,7 +15,6 @@ import {
   Spinner,
   Table,
   Tbody,
-  Text,
   Th,
   Thead,
   Tr,
