@@ -13,6 +13,7 @@ const searchItem = createAsyncThunk('items/search', async ({ query }) => {
       return rest;
     })
 
+    console.log(result);
     return result;
   } catch (error) {
     console.log(error);

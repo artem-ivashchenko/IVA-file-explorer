@@ -28,6 +28,7 @@ import { clearFilteredItems, setLoading } from "../store/slice/itemSlice";
 const Header = () => {
   const [rawQuery, setRawQuery] = useState("");
   const query = useSelector((state) => state.filters.query);
+  const errorAlert = useSelector((state) => state.items.errorAlert);
   
   const dispatch = useDispatch();
   const toast = useToast();
@@ -56,7 +57,7 @@ const Header = () => {
   }
 
   useEffect(() => {
-    if (!query) {
+    if (!query || errorAlert) {
       dispatch(clearFilteredItems());
       dispatch(setLoading(false));
       return;

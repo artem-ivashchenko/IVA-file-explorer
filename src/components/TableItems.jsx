@@ -54,7 +54,7 @@ const TableItems = () => {
   const visibleItems = getVisibleItems(chosenItems, type, sortField);
 
   useEffect(() => {
-    // dispatch(clearFilteredItems());
+    dispatch(clearFilteredItems());
     dispatch(setQuery(""));
 
     dispatch(fetchItems(path)).then((response) => {
